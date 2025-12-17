@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'eventos'
+app_name = 'eventos' 
 
 urlpatterns = [
     # Home
@@ -28,12 +28,14 @@ urlpatterns = [
     path('eventos/<int:pk>/editar/', views.EventoUpdateView.as_view(), name='editar_evento'),
     path('eventos/<int:pk>/eliminar/', views.EventoDeleteView.as_view(), name='eliminar_evento'),
 
-    # Agregar estas rutas al urlpatterns
-
+    # Equipos
     path('equipos/', views.EquipoListView.as_view(), name='lista_equipos'),
     path('equipos/crear/', views.EquipoCreateView.as_view(), name='crear_equipo'),
     path('equipos/<int:pk>/', views.EquipoDetailView.as_view(), name='detalle_equipo'),
     path('equipos/<int:pk>/editar/', views.EquipoUpdateView.as_view(), name='editar_equipo'),
     path('equipos/<int:pk>/eliminar/', views.EquipoDeleteView.as_view(), name='eliminar_equipo'),
-]
 
+    # --- RUTAS NUEVAS PARA INSCRIPCIONES (ACTIVIDAD) ---
+    path('inscripciones/', views.lista_inscripciones, name='lista_inscripciones'),
+    path('inscripciones/crear/', views.crear_inscripcion, name='crear_inscripcion'),
+]

@@ -1,10 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import Deporte, Evento, Participante
-
-
-from .models import Deporte, Evento, Participante, Equipo
+from .models import Deporte, Evento, Participante, Equipo, Inscripcion
 
 
 class DeporteForm(forms.ModelForm):
@@ -208,3 +205,15 @@ class EquipoForm(forms.ModelForm):
             if not ciudad:
                 raise ValidationError("La ciudad no puede estar vacía")
         return ciudad
+    
+
+    
+
+class InscripcionForm(forms.ModelForm):
+    class Meta:
+        model = Inscripcion
+        fields = ['evento', 'participante']
+        widgets = {
+            'evento': forms.Select(attrs={'class': 'form-control'}),
+            'participante': forms.Select(attrs={'class': 'form-control'}),
+        }

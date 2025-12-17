@@ -1,11 +1,14 @@
 from typing import Optional, List
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import Deporte, Evento, Participante
-from .repositories import DeporteRepository, EventoRepository, ParticipanteRepository
-
-
-from .repositories import DeporteRepository, EventoRepository, ParticipanteRepository, EquipoRepository
+from .models import Deporte, Evento, Participante, Equipo, Inscripcion
+from .repositories import (
+    DeporteRepository, 
+    EventoRepository, 
+    ParticipanteRepository, 
+    EquipoRepository,
+    InscripcionRepository
+)
 
 
 class DeporteService:
@@ -403,3 +406,18 @@ class EquipoService:
         # Por ejemplo: no permitir eliminar equipos con eventos asociados
 
         return EquipoRepository.delete(equipo_id)
+    
+
+
+
+class InscripcionService:
+    def __init__(self, repository: InscripcionRepository = None):
+        self.repository = repository or InscripcionRepository()
+
+    def inscribir(self, evento, participante):
+        if self.repository.exists(evento, participante):
+            raise ValueError("El participante ya está inscrito en este evento.")
+        return self.repository.create(evento, participante)
+
+    def listar(self):
+        return self.repository.get_all()

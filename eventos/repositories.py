@@ -1,9 +1,7 @@
 from typing import List, Optional
 from django.db.models import QuerySet
-from .models import Deporte, Evento, Participante, EventoParticipante
 
-from .models import Deporte, Evento, Participante, Equipo
-
+from .models import Deporte, Evento, Participante, EventoParticipante, Equipo, Inscripcion
 
 class DeporteRepository:
     """Repositorio para operaciones de acceso a datos de Deporte"""
@@ -264,3 +262,15 @@ class EquipoRepository:
             return True
         except Equipo.DoesNotExist:
             return False
+        
+
+
+class InscripcionRepository:
+    def get_all(self):
+        return Inscripcion.objects.all().order_by('-fecha_inscripcion')
+
+    def create(self, evento, participante):
+        return Inscripcion.objects.create(evento=evento, participante=participante)
+
+    def exists(self, evento, participante):
+        return Inscripcion.objects.filter(evento=evento, participante=participante).exists()

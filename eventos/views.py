@@ -3,12 +3,18 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
-from .models import Deporte, Evento, Participante
-from .forms import DeporteForm, EventoForm, ParticipanteForm
-from .services import DeporteService, EventoService, ParticipanteService
 
 
-from .models import Deporte, Evento, Participante, Equipo
+from .models import Deporte, Evento, Participante, Equipo, Inscripcion
+from .forms import DeporteForm, EventoForm, ParticipanteForm, EquipoForm, InscripcionForm
+from .services import (
+    DeporteService, 
+    EventoService, 
+    ParticipanteService, 
+    EquipoService, 
+    InscripcionService
+)
+from .repositories import InscripcionRepository
 
 
 # ==================== VISTAS PARA DEPORTES ====================
@@ -327,10 +333,8 @@ def home(request):
 
 
 
-from .services import DeporteService, EventoService, ParticipanteService, EquipoService
-from .forms import DeporteForm, EventoForm, ParticipanteForm, EquipoForm
 
-# Agregar al final del archivo
+
 
 class EquipoListView(ListView):
     """Vista para listar todos los equipos"""
@@ -428,3 +432,40 @@ class EquipoDeleteView(DeleteView):
         except ValidationError as e:
             messages.error(self.request, str(e))
             return redirect(self.success_url)
+        
+
+
+# ==================== VISTAS PARA INSCRIPCIONES (ACTIVIDAD) ====================
+
+def crear_inscripcion(request):
+    """Vista funcional para crear una inscripción siguiendo arquitectura N-Capas"""
+    repo = InscripcionRepository()
+    service = InscripcionService(repo)
+
+    if request.method == 'POST':
+        form = InscripcionForm(request.POST)
+        if form.is_valid():
+            try:
+                # El controlador (View) delega la lógica al Servicio
+                service.inscribir(
+                    form.cleaned_data['evento'], 
+                    form.cleaned_data['participante']
+                )
+                # ESTAS LINEAS DEBEN IR DENTRO DEL TRY (INDENTADAS)
+                messages.success(request, "Inscripción creada correctamente")
+                return redirect('eventos:lista_inscripciones')
+            except ValueError as e:
+                # El EXCEPT debe estar alineado con el TRY
+                messages.error(request, str(e))
+    else:
+        form = InscripcionForm()
+    
+    return render(request, 'eventos/crear_inscripcion.html', {'form': form})
+
+def lista_inscripciones(request):
+    """Vista funcional para listar inscripciones siguiendo arquitectura N-Capas"""
+    repo = InscripcionRepository()
+    service = InscripcionService(repo)
+    
+    inscripciones = service.listar()
+    return render(request, 'eventos/lista_inscripciones.html', {'inscripciones': inscripciones})
