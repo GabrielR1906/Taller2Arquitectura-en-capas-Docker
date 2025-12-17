@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=eventos_db
+      - POSTGRES_USER=eventos_user
+      - POSTGRES_PASSWORD=eventos_pass
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-change-in-production
+      - POSTGRES_NAME=eventos_db
+      - POSTGRES_USER=eventos_user
+      - POSTGRES_PASSWORD=eventos_pass
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  static_volume:
